@@ -1,7 +1,7 @@
 // Copyright (c) RoochNetwork
 // SPDX-License-Identifier: Apache-2.0
 // Author: Jason Jo
-
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { LoadingButton } from "@mui/lab";  // 引入 Material UI 中的 LoadingButton 组件
 import { Button, Chip, Divider, Stack, Typography } from "@mui/material";  // 引入 Material UI 中的 Button、Chip、Divider、Stack 和 Typography 组件
 import {
@@ -20,6 +20,7 @@ import { StakeByGrowVotes } from './componnents/stake_by_grow_votes';
 import { CheckIn } from './componnents/check_in';
 import { Raffle } from './componnents/raffle';
 import { CheckIn as Market } from './componnents/market';
+import { BentoDemo }  from './pages/demo';
 
 function App() {
   const wallets = useWallets();
@@ -180,15 +181,18 @@ function App() {
   }, [sessionKey]);
 
 
-
   return (
-    <Stack
-      className="font-sans min-w-[1024px]"
+    <Router>
+         <Routes>
+        <Route path="/bento-demo" element={<BentoDemo />} />
+        <Route path="/" element={
+        <Stack
       direction="column"
       sx={{
         minHeight: "calc(100vh - 4rem)",
       }}
     >
+ {/* 主页内容 */}
       <Stack justifyContent="space-between" className="w-full">
         <img src="./rooch_black_combine.svg" width="120px" alt="" />  {/* 显示应用的 logo */}
         <Stack spacing={1} justifyItems="flex-end">
@@ -334,8 +338,7 @@ function App() {
           <LoadingButton
             variant="contained"
             onClick={handleStakeOperations.stake}
-          >
-            Stake
+          >Stake
           </LoadingButton>
           <LoadingButton
             variant="contained"
@@ -449,9 +452,21 @@ function App() {
           >
             Query Price
           </LoadingButton>
+
+          <Button 
+            variant="contained" 
+            component={Link} 
+            to="/bento-demo"
+          >
+            打开 Bento Demo
+          </Button>
+          
         </Stack>
       </Stack>
     </Stack>
+            } />
+    </Routes>
+    </Router>
 );
 }
 

@@ -4,7 +4,9 @@
 
 export default {
   plugins: {
-    tailwindcss: {},
+    // tailwindcss: {},
     autoprefixer: {},
+    '@tailwindcss/postcss': {}, // 更新为新的插件引用
+
   },
 };
