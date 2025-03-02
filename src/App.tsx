@@ -25,6 +25,7 @@ import { keyframes } from "@emotion/react";
 import { styled } from "@mui/material/styles";
 
 
+
 // 定义背景动画
 const backgroundAnimation = keyframes`
   0% {
@@ -332,11 +333,18 @@ function App() {
       direction="column"
       sx={{
         minHeight: "calc(100vh - 4rem)",
+        width: "100%", 
+        height: "auto",
       }}
     >
       <Stack justifyContent="space-between" className="w-full">
         {/* <Text>FATE</Text> */}
-        <img src="./rooch_black_combine.svg" width="120px" alt="" /> 
+              <img 
+        src="./rooch_black_combine.svg" 
+        width="120px" 
+        height="40px" // 添加高度
+        alt="Rooch Logo" 
+      />        
         <Stack spacing={1} justifyItems="flex-end">
           <Chip
             label="Rooch Testnet"  // 显示链的标签
