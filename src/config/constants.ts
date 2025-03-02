@@ -1,1 +1,3 @@
-export const MODULE_ADDRESS = "0x3586e29fe63e747a419c0ac7fcc4c679b2ee9bddc84d734c4f24912f8e1eb6fe";
+export const MODULE_ADDRESS = "0xbdd832f8c72aac37d0da3b6cb5a7ae89928ee52e5d5d6b991dfcbf6902007f50";
+export const RGASTYPE = "0x3::gas_coin::RGas";
+export const FATETYPE = `${MODULE_ADDRESS}::fate::FATE`;
