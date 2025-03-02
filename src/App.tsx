@@ -134,6 +134,27 @@ function App() {
     QueryPriceRecord,
   } = Market();
 
+  const [checkInData, setCheckInData] = useState<any>(null);
+  const [checkInConfig, setCheckInConfig] = useState<any>(null);
+
+  // 获取签到数据
+  useEffect(() => {
+    const fetchCheckInData = async () => {
+      if (currentAddress) {
+        try {
+          const record = await QueryCheckInRecord();
+          setCheckInData(record);
+          
+          const config = await QueryDailyCheckInConfig();
+          setCheckInConfig(config);
+        } catch (error) {
+          console.error("获取签到数据失败:", error);
+        }
+      }
+    };
+    
+    fetchCheckInData();
+  }, [currentAddress]);
 
   // 添加导航卡片数据
   const navigationCards: NavigationCard[] = [
@@ -147,10 +168,18 @@ function App() {
     },
     {
       title: "每日签到",
-      description: "进行每日签到并查看签到记录和配置。",
+      description: checkInData 
+        ? `已连续签到 ${checkInData.continue_days} 天，总计 ${checkInData.total_sign_in_days} 天` 
+        : "进行每日签到并查看签到记录和配置。",
       icon: "📅",
       onClick: () => window.location.href = '/check-in',
-      width: { lg: 4 } // 在大屏幕上占1/3宽度
+      width: { lg: 4 },
+      extraContent: checkInData && checkInConfig ? {
+        continueDays: checkInData.continue_days,
+        totalDays: checkInData.total_sign_in_days,
+        nextReward: checkInConfig.daily_rewards[Math.min(checkInData.continue_days, checkInConfig.daily_rewards.length - 1)],
+        isCheckedInToday: new Date(Number(checkInData.last_sign_in_timestamp) * 1000).toDateString() === new Date().toDateString()
+      } : undefined
       ,
     },
     {
