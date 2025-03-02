@@ -312,15 +312,17 @@ export function GridNavigation({
       >
         <CardContainer className="w-full" onClick={card.onClick}>
           <CardBody className={cn(
-            "bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition-all duration-300",
-            "flex flex-col justify-start items-start p-6 relative overflow-hidden",
-            "min-h-[180px]"
-          )}
-          style={{ minHeight: card.height || defaultHeight }}
-          >
+           "backdrop-filter backdrop-blur-md bg-white/30 border border-white/40 rounded-xl shadow-md hover:shadow-xl transition-all duration-300",
+           "flex flex-col justify-start items-start p-6 relative overflow-hidden",
+           "min-h-[180px]"
+         )}
+         style={{ minHeight: card.height || defaultHeight }}
+         >
+           {/* 移除原有的背景渐变效果 */}
+           {/* <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-50"></div> */}
             {/* 背景渐变效果 */}
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-50"></div>
-            
+          {/* 添加新的玻璃态效果 */}
+           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/20 rounded-xl"></div>            
             {/* 卡片内容 */}
             <CardItem
               translateZ="50"
