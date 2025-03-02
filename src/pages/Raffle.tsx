@@ -179,10 +179,7 @@ function RafflePage() {
       <>
         <AnimatedBackground />
         
-        {/* 添加浮动粒子 - 减少数量以提高性能 */}
-        <Particle size={15} top="10%" left="10%" delay={0} />
-        <Particle size={20} top="20%" left="80%" delay={1} />
-        <Particle size={12} top="70%" left="15%" delay={2} />
+     
         
         {/* 抽奖成功时显示彩花效果 */}
         {showConfetti && (

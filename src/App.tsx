@@ -77,19 +77,6 @@ const particleFloat = keyframes`
   }
 `;
 
-// 创建粒子组件
-const Particle = styled('div')<{ size: number; top: string; left: string; delay: number }>`
-  position: fixed;
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  background-color: rgba(138, 43, 226, 0.2);
-  border-radius: 50%;
-  top: ${props => props.top};
-  left: ${props => props.left};
-  z-index: -1;
-  animation: ${particleFloat} ${props => 5 + props.delay}s ease-in-out infinite;
-  animation-delay: ${props => props.delay}s;
-`;
 
 
 
@@ -322,12 +309,12 @@ function App() {
     {/* 添加动画背景 */}
     <AnimatedBackground />
     
-    {/* 添加浮动粒子 */}
-    <Particle size={15} top="10%" left="10%" delay={0} />
+    {/* 移除暂时添加浮动粒子 */}
+    {/* <Particle size={15} top="10%" left="10%" delay={0} />
     <Particle size={20} top="20%" left="80%" delay={1} />
     <Particle size={12} top="70%" left="15%" delay={2} />
     <Particle size={18} top="40%" left="60%" delay={1.5} />
-    <Particle size={10} top="80%" left="75%" delay={0.5} />
+    <Particle size={10} top="80%" left="75%" delay={0.5} /> */}
     <Stack
       className="font-sans min-w-[1024px]"
       direction="column"
