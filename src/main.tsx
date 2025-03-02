@@ -8,6 +8,8 @@ import { ThemeProvider, createTheme } from "@mui/material";
 import { RoochProvider, WalletProvider } from "@roochnetwork/rooch-sdk-kit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import CheckInPage from "./pages/CheckInPage.tsx";
 import App from "./App.tsx";
 import "./index.css";
 import { networkConfig } from "./networks.ts";
@@ -72,7 +74,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <RoochProvider networks={networkConfig} defaultNetwork="testnet">
         <WalletProvider chain={"bitcoin"} autoConnect>
-          <App />
+        <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<App />} />
+              <Route path="/check-in" element={<CheckInPage />} />
+            </Routes>
+          </BrowserRouter>
         </WalletProvider>
       </RoochProvider>
     </QueryClientProvider>

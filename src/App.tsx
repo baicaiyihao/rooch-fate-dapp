@@ -20,6 +20,77 @@ import { StakeByGrowVotes } from './componnents/stake_by_grow_votes';
 import { CheckIn } from './componnents/check_in';
 import { Raffle } from './componnents/raffle';
 import { CheckIn as Market } from './componnents/market';
+import { GridNavigation, NavigationCard } from './componnents/grid_navigation'; 
+import { keyframes } from "@emotion/react";
+import { styled } from "@mui/material/styles";
+
+
+// 定义背景动画
+const backgroundAnimation = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+`;
+
+// 创建带有动画背景的容器
+const AnimatedBackground = styled('div')`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/original_bg.webp');
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  animation: ${backgroundAnimation} 30s ease infinite;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(5px);
+  }
+`;
+
+// 添加浮动粒子动画
+const particleFloat = keyframes`
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg);
+  }
+`;
+
+// 创建粒子组件
+const Particle = styled('div')<{ size: number; top: string; left: string; delay: number }>`
+  position: fixed;
+  width: ${props => props.size}px;
+  height: ${props => props.size}px;
+  background-color: rgba(138, 43, 226, 0.2);
+  border-radius: 50%;
+  top: ${props => props.top};
+  left: ${props => props.left};
+  z-index: -1;
+  animation: ${particleFloat} ${props => 5 + props.delay}s ease-in-out infinite;
+  animation-delay: ${props => props.delay}s;
+`;
+
+
 
 function App() {
   const wallets = useWallets();
@@ -62,6 +133,41 @@ function App() {
     Pay,
     QueryPriceRecord,
   } = Market();
+
+
+  // 添加导航卡片数据
+  const navigationCards: NavigationCard[] = [
+    {
+      title: "质押操作",
+      description: "管理您的质押、解除质押和领取奖励等操作。",
+      icon: "💰",
+      onClick: () => document.getElementById('stake-operations')?.scrollIntoView({ behavior: 'smooth' }),
+      width:{lg:8}
+      　
+    },
+    {
+      title: "每日签到",
+      description: "进行每日签到并查看签到记录和配置。",
+      icon: "📅",
+      onClick: () => window.location.href = '/check-in',
+      width: { lg: 4 } // 在大屏幕上占1/3宽度
+      ,
+    },
+    {
+      title: "抽奖系统",
+      description: "参与抽奖活动并领取奖励。",
+      icon: "🎲",
+      onClick: () => document.getElementById('raffle-operations')?.scrollIntoView({ behavior: 'smooth' }),
+      width: { lg: 4} 
+    },
+    {
+      title: "市场交易",
+      description: "进行支付和查询价格记录。",
+      icon: "🛒",
+      onClick: () => document.getElementById('market-operations')?.scrollIntoView({ behavior: 'smooth' }),
+      width: { lg: 8 } 
+    }
+  ];
 
   // 处理函数
   const handleStakeOperations = {
@@ -182,6 +288,16 @@ function App() {
 
 
   return (
+    <>
+    {/* 添加动画背景 */}
+    <AnimatedBackground />
+    
+    {/* 添加浮动粒子 */}
+    <Particle size={15} top="10%" left="10%" delay={0} />
+    <Particle size={20} top="20%" left="80%" delay={1} />
+    <Particle size={12} top="70%" left="15%" delay={2} />
+    <Particle size={18} top="40%" left="60%" delay={1.5} />
+    <Particle size={10} top="80%" left="75%" delay={0.5} />
     <Stack
       className="font-sans min-w-[1024px]"
       direction="column"
@@ -190,7 +306,8 @@ function App() {
       }}
     >
       <Stack justifyContent="space-between" className="w-full">
-        <img src="./rooch_black_combine.svg" width="120px" alt="" />  {/* 显示应用的 logo */}
+        {/* <Text>FATE</Text> */}
+        <img src="./rooch_black_combine.svg" width="120px" alt="" /> 
         <Stack spacing={1} justifyItems="flex-end">
           <Chip
             label="Rooch Testnet"  // 显示链的标签
@@ -213,9 +330,50 @@ function App() {
           </Button>
         </Stack>
       </Stack>
+
+     
+      {/* 添加网格导航部分 */}
+
+        {/* <Stack 
+          direction="column-reverse"
+          spacing={2}
+        sx={{
+      justifyContent: "center",
+      alignItems: "stretch",
+    }}>
+        <div style={{ width: '100%', overflow: 'hidden' }}>
+     <GridNavigation cards={navigationCards} defaultHeight="550px" />
+        </div>
+        </Stack> */}
+
+    <Stack 
+      direction="column-reverse"
+      spacing={2}
+      sx={{
+        justifyContent: "center",
+        alignItems: "stretch",
+        width: '100%',
+        position: 'relative',
+        overflow: 'visible' // 允许子元素溢出
+      }}
+    >
+      <div style={{ 
+        width: '100%', 
+        overflow: 'visible',
+        position: 'relative'
+      }}>
+        <GridNavigation cards={navigationCards} defaultHeight="550px" fullWidth={true} />
+      </div>
+    </Stack>
+    
+            
       <Typography className="text-4xl font-semibold mt-6 text-left w-full mb-4">
         My First Rooch dApp | <span className="text-2xl">Counter</span>
       </Typography>
+
+              
+
+      
       <Divider className="w-full" />
       <Stack
         direction="column"
@@ -451,7 +609,8 @@ function App() {
           </LoadingButton>
         </Stack>
       </Stack>
-    </Stack>
+      </Stack>
+      </>
 );
 }
 
