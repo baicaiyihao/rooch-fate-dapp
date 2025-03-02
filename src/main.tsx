@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CheckInPage from "./pages/CheckInPage.tsx";
+import RafflePage from "./pages/Raffle.tsx";
 import App from "./App.tsx";
 import "./index.css";
 import { networkConfig } from "./networks.ts";
@@ -78,6 +79,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Routes>
               <Route path="/" element={<App />} />
               <Route path="/check-in" element={<CheckInPage />} />
+              <Route path="/raffle" element={<RafflePage/>} />
             </Routes>
           </BrowserRouter>
         </WalletProvider>

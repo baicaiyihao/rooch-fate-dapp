@@ -186,7 +186,7 @@ function App() {
       title: "抽奖系统",
       description: "参与抽奖活动并领取奖励。",
       icon: "🎲",
-      onClick: () => document.getElementById('raffle-operations')?.scrollIntoView({ behavior: 'smooth' }),
+      onClick: () => window.location.href = '/raffle',
       width: { lg: 4} 
     },
     {
