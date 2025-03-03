@@ -20,7 +20,3 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-body {
-  background: linear-gradient(180deg, hsla(0, 0%, 100%, 0) 0, #fff 100vh), fixed 0 0 /20px 20px radial-gradient(#d1d1d1 1px, transparent 0), fixed 10px 10px /20px 20px radial-gradient(#d1d1d1 1px, transparent 0)
-}

@@ -3,7 +3,7 @@
 // Author: Jason Jo
 
 import { LoadingButton } from "@mui/lab";  // 引入 Material UI 中的 LoadingButton 组件
-import { Button, Chip, Divider, Stack, Typography } from "@mui/material";  // 引入 Material UI 中的 Button、Chip、Divider、Stack 和 Typography 组件
+import { Button, Chip, Divider, Stack, Typography,Box } from "@mui/material";  // 引入 Material UI 中的 Button、Chip、Divider、Stack 和 Typography 组件
 import {
   useConnectWallet,
   useCreateSessionKey,
@@ -19,11 +19,11 @@ import { shortAddress } from "./utils";  // 引入工具函数 shortAddress
 import { StakeByGrowVotes } from './componnents/stake_by_grow_votes';
 import { CheckIn } from './componnents/check_in';
 import { Raffle } from './componnents/raffle';
-import { CheckIn as Market } from './componnents/market';
 import { GridNavigation, NavigationCard } from './componnents/grid_navigation'; 
 import { keyframes } from "@emotion/react";
 import { styled } from "@mui/material/styles";
 
+import { useSessionKeyManager } from './hooks/useSessionKeyManager';
 
 
 // 定义背景动画
@@ -117,11 +117,7 @@ function App() {
     QueryCheckInRaffleRecord,
   } = Raffle();
 
-  const {
-    Pay,
-    QueryPriceRecord,
-  } = Market();
-
+  
   const [checkInData, setCheckInData] = useState<any>(null);
   const [checkInConfig, setCheckInConfig] = useState<any>(null);
 
@@ -150,7 +146,7 @@ function App() {
       title: "质押操作",
       description: "管理您的质押、解除质押和领取奖励等操作。",
       icon: "💰",
-      onClick: () => document.getElementById('stake-operations')?.scrollIntoView({ behavior: 'smooth' }),
+      onClick: () => window.location.href = '/stake',
       width:{lg:8}
       　
     },
@@ -181,7 +177,7 @@ function App() {
       title: "市场交易",
       description: "进行支付和查询价格记录。",
       icon: "🛒",
-      onClick: () => document.getElementById('market-operations')?.scrollIntoView({ behavior: 'smooth' }),
+      onClick: () => window.location.href = '/leaderboard',
       width: { lg: 8 } 
     }
   ];
@@ -252,16 +248,6 @@ function App() {
     }
   };
 
-  const handleMarketOperations = {
-    pay: async () => {
-      const result = await Pay();
-      console.log('Pay Result:', result);
-    },
-    queryPrice: async () => {
-      const result = await QueryPriceRecord("taro");
-      console.log('Price Record:', result);
-    }
-  };
 
   // 创建 sessionKey 的处理函数
   const handlerCreateSessionKey = async () => {
@@ -326,13 +312,15 @@ function App() {
     >
       <Stack justifyContent="space-between" className="w-full">
         {/* <Text>FATE</Text> */}
-              <img 
-        src="./rooch_black_combine.svg" 
-        width="120px" 
-        height="40px" // 添加高度
-        alt="Rooch Logo" 
-      />        
-        <Stack spacing={1} justifyItems="flex-end">
+        <Box sx={{ fontWeight: 'bold' }} width="120px">FATEX</Box>
+
+
+            <Stack direction="row"
+      spacing={1}
+      sx={{
+        justifyContent: "flex-end",
+        alignItems: "center",
+      }}>
           <Chip
             label="Rooch Testnet"  // 显示链的标签
             variant="filled"
@@ -354,21 +342,6 @@ function App() {
           </Button>
         </Stack>
       </Stack>
-
-     
-      {/* 添加网格导航部分 */}
-
-        {/* <Stack 
-          direction="column-reverse"
-          spacing={2}
-        sx={{
-      justifyContent: "center",
-      alignItems: "stretch",
-    }}>
-        <div style={{ width: '100%', overflow: 'hidden' }}>
-     <GridNavigation cards={navigationCards} defaultHeight="550px" />
-        </div>
-        </Stack> */}
 
     <Stack 
       direction="column-reverse"
@@ -607,32 +580,7 @@ function App() {
           </LoadingButton>
         </Stack>
       </Stack>
-
-      {/* Market Operations 部分 */}
-      <Divider className="w-full !mt-12" />
-      <Stack
-        className="mt-4 w-full font-medium"
-        direction="column"
-        alignItems="flex-start"
-      >
-        <Typography className="text-3xl font-bold">
-          Market Operations
-        </Typography>
-        <Stack direction="row" spacing={2} className="mt-4">
-          <LoadingButton
-            variant="contained"
-            onClick={handleMarketOperations.pay}
-          >
-            Pay
-          </LoadingButton>
-          <LoadingButton
-            variant="contained"
-            onClick={handleMarketOperations.queryPrice}
-          >
-            Query Price
-          </LoadingButton>
-        </Stack>
-      </Stack>
+     
       </Stack>
       </>
 );
