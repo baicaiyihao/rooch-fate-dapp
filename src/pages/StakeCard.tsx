@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Card, Button, Space, Typography, Row, Col, Statistic, Alert } from 'antd';
 import { StakeByGrowVotes } from '../componnents/stake_by_grow_votes';
-import { useCurrentAddress, useWalletStore } from '@roochnetwork/rooch-sdk-kit';
+import { useCurrentAddress, useWalletStore, useRoochClient } from '@roochnetwork/rooch-sdk-kit';
+import { getCoinDecimals, formatBalance } from '../utils/coinUtils';
+import { FATETYPE } from '../config/constants';
 
 const { Text, Link } = Typography;
 
@@ -10,8 +12,10 @@ export const StakeCard = () => {
     const [stakeInfo, setStakeInfo] = useState<any>(null);
     const [hasVotes, setHasVotes] = useState(true);
     const [projectName, setProjectName] = useState<string>('');
+    const [fateBalance, setFateBalance] = useState<string>('0');
     const currentAddress = useCurrentAddress();
     const connectionStatus = useWalletStore((state) => state.connectionStatus);
+    const client = useRoochClient();
 
     const { 
         QueryStakePoolInfo, 
@@ -50,6 +54,23 @@ export const StakeCard = () => {
         }
     };
 
+    const fetchFateBalance = async () => {
+        if (!currentAddress || !client) return;
+        
+        try {
+            const decimals = await getCoinDecimals(client, FATETYPE);
+            const balance = await client.getBalance({
+                owner: currentAddress?.genRoochAddress().toHexAddress() || "",
+                coinType: FATETYPE
+            }) as any;
+            console.log(balance);
+            setFateBalance(formatBalance(balance?.balance, decimals));
+        } catch (error) {
+            console.error('获取 FATE 余额失败:', error);
+            setFateBalance('0');
+        }
+    };
+
     useEffect(() => {
         fetchPoolInfo();
     }, []);
@@ -57,6 +78,7 @@ export const StakeCard = () => {
     useEffect(() => {
         if (currentAddress) {
             fetchUserInfo();
+            fetchFateBalance();
         }
     }, [currentAddress]);
 
@@ -67,7 +89,7 @@ export const StakeCard = () => {
     const handleStake = async () => {
         try {
             await Stake();
-            fetchUserInfo();
+            await Promise.all([fetchUserInfo(), fetchPoolInfo()]);
         } catch (error) {
             console.error('质押失败:', error);
         }
@@ -76,7 +98,7 @@ export const StakeCard = () => {
     const handleUnstake = async () => {
         try {
             await UnStake();
-            fetchUserInfo();
+            await Promise.all([fetchUserInfo(), fetchPoolInfo()]);
         } catch (error) {
             console.error('解除质押失败:', error);
         }
@@ -85,7 +107,7 @@ export const StakeCard = () => {
     const handleClaim = async () => {
         try {
             await ClaimRewords();
-            fetchUserInfo();
+            await Promise.all([fetchUserInfo(), fetchFateBalance()]);
         } catch (error) {
             console.error('领取奖励失败:', error);
         }
@@ -124,6 +146,11 @@ export const StakeCard = () => {
         return (
             <Card title="我的质押" style={{ marginBottom: 16 }}>
                 <Space direction="vertical" style={{ width: '100%' }}>
+                    <Statistic 
+                        title="FATE 余额" 
+                        value={fateBalance} 
+                        suffix="FATE"
+                    />
                     <Statistic 
                         title="已质押数量" 
                         value={stakeInfo?.stake_grow_votes || 0} 

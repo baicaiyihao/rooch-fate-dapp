@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, Button, Space, Typography } from 'antd';
+import { Card, Button, Space, Typography, message } from 'antd';
 import { CheckIn } from '../componnents/check_in';
 import { Raffle } from '../componnents/raffle';
 import { useCurrentAddress } from '@roochnetwork/rooch-sdk-kit';
@@ -54,12 +54,64 @@ export const RaffleCard = () => {
         }
     };
 
+    const getPrizeLevel = (result: number, config: any) => {
+        if (!result || !config) return null;
+
+        const resultNum = Number(result);
+        const grandWeight = Number(config.grand_prize_weight);
+        const secondWeight = Number(config.second_prize_weight);
+        const thirdWeight = Number(config.third_prize_weight);
+        
+        // 计算累积权重
+        const totalWeight = grandWeight + secondWeight + thirdWeight;
+        const normalizedResult = (resultNum / Number(config.max_raffle_count_weight)) * totalWeight;
+
+        if (normalizedResult <= grandWeight) {
+            return {
+                level: 1,
+                name: "特等奖",
+                duration: Number(config.grand_prize_duration)
+            };
+        } else if (normalizedResult <= (grandWeight + secondWeight)) {
+            return {
+                level: 2,
+                name: "二等奖",
+                duration: Number(config.second_prize_duration)
+            };
+        } else {
+            return {
+                level: 3,
+                name: "三等奖",
+                duration: Number(config.third_prize_duration)
+            };
+        }
+    };
+
     const handleFateRaffle = async () => {
         try {
-            await GetCheckInRaffleByFate();
+            const result = await GetCheckInRaffleByFate();
+            console.log('Fate抽奖结果:', result);
+            
+            // 添加类型检查
+            if (result === undefined) {
+                message.error('抽奖结果无效');
+                return;
+            }
+            
+            // 判断中奖等级
+            const prizeLevel = getPrizeLevel(Number(result), raffleConfig);
+            
+            if (prizeLevel) {
+                message.success(
+                    `恭喜获得${prizeLevel.name}！获取${prizeLevel.duration}FATE`,
+                    5
+                );
+            }
+            
             fetchData();
         } catch (error) {
             console.error('Fate抽奖失败:', error);
+            message.error('抽奖失败，请重试');
         }
     };
 

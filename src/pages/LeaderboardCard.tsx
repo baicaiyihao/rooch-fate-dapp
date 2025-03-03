@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Card, Button, Space, Typography, Table, Input, message } from 'antd';
 import { Leaderboard } from '../componnents/leaderboard';
 import { UserNft } from '../componnents/usernft'; // 引入 UserNft
-import { useCurrentAddress } from '@roochnetwork/rooch-sdk-kit';
+import { useCurrentAddress, useRoochClient } from '@roochnetwork/rooch-sdk-kit';
 import { RankTiersTableData } from '../type';
+import { getCoinDecimals, formatBalance } from '../utils/coinUtils';
+import { FATETYPE } from '../config/constants';
 
 const { Text } = Typography;
 
@@ -72,30 +74,8 @@ export const LeaderboardCard = () => {
         return tierInfo ? Number(tierInfo.value.level) : '-';
     };
 
-    // 在组件加载时获取数据
-    useEffect(() => {
-        fetchRankingsData();
-        fetchUserNftData();
-    }, []);
-
-    // 处理燃烧逻辑
-    const handleBurn = async () => {
-        if (!burnAmount || isNaN(Number(burnAmount))) {
-            message.error('请输入有效的数量');
-            return;
-        }
-
-        try {
-            await Burnfate(Number(burnAmount));
-            message.success('燃烧成功');
-            fetchRankingsData(); // 刷新排行榜数据
-            fetchUserNftData();  // 刷新用户数据
-            setBurnAmount('');   // 清空输入框
-        } catch (error) {
-            console.error('燃烧失败:', error);
-            message.error('燃烧失败');
-        }
-    };
+    const [fateBalance, setFateBalance] = useState<string>('0');
+    const client = useRoochClient();
 
     // 缩短地址显示
     const shortenAddress = (address: string) => {
@@ -135,10 +115,53 @@ export const LeaderboardCard = () => {
         return userRanking?.rank || '-';
     };
 
+    const fetchFateBalance = async () => {
+        if (!currentAddress || !client) return;
+        
+        try {
+            const decimals = await getCoinDecimals(client, FATETYPE);
+            const balance = await client.getBalance({
+                owner: currentAddress?.genRoochAddress().toHexAddress() || "",
+                coinType: FATETYPE
+            }) as any;
+            setFateBalance(formatBalance(balance?.balance, decimals));
+        } catch (error) {
+            console.error('获取 FATE 余额失败:', error);
+            setFateBalance('0');
+        }
+    };
+
+    useEffect(() => {
+        fetchRankingsData();
+        fetchUserNftData();
+        fetchFateBalance();
+    }, [currentAddress]);
+
+    // 修改 handleBurn，成功后刷新余额
+    const handleBurn = async () => {
+        if (!burnAmount || isNaN(Number(burnAmount))) {
+            message.error('请输入有效的数量');
+            return;
+        }
+
+        try {
+            await Burnfate(Number(burnAmount));
+            message.success('燃烧成功');
+            await Promise.all([
+                fetchRankingsData(),
+                fetchUserNftData(),
+                fetchFateBalance()
+            ]);
+            setBurnAmount('');
+        } catch (error) {
+            console.error('燃烧失败:', error);
+            message.error('燃烧失败');
+        }
+    };
+
     return (
         <div style={{ padding: 20 }}>
             <Card title="排行榜" style={{ width: '100%', maxWidth: 1200, margin: '0 auto' }}>
-                {/* 用户信息区域 */}
                 <Card type="inner" title="我的信息" style={{ marginBottom: 16 }}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         <div>
@@ -150,14 +173,21 @@ export const LeaderboardCard = () => {
                         <div>
                             <Text>已燃烧数量: {userNftData?.burn_amount || '-'}</Text>
                         </div>
-                        <Space>
+                        <Space direction="vertical" style={{ width: '100%' }}>
                             <Input
                                 placeholder="输入要燃烧的FATE数量"
                                 value={burnAmount}
                                 onChange={e => setBurnAmount(e.target.value)}
                                 style={{ width: 200 }}
                             />
-                            <Button type="primary" onClick={handleBurn}>
+                            <Text type="secondary">当前 FATE 余额: {fateBalance}</Text>
+                            <Button 
+                                type="primary" 
+                                onClick={handleBurn}
+                                disabled={!burnAmount || 
+                                    Number(burnAmount) <= 0 || 
+                                    Number(burnAmount) > Number(fateBalance)}
+                            >
                                 燃烧
                             </Button>
                         </Space>

@@ -1,4 +1,4 @@
-import { Args, Transaction } from "@roochnetwork/rooch-sdk";
+import { Args, PaginatedIndexerEventViews, Transaction } from "@roochnetwork/rooch-sdk";
 import { MODULE_ADDRESS } from "../config/constants";
 import { useCurrentAddress, useRoochClient, UseSignAndExecuteTransaction } from "@roochnetwork/rooch-sdk-kit";
 import { CheckInRaffle, CheckInRaffleRecord } from "../type";
@@ -17,8 +17,26 @@ export function Raffle(){
             function: "get_check_in_raffle_by_fate",
             args: [],
         });
-        return await signAndExecuteTransaction({ transaction: txn });
-    }
+    
+        const result = await signAndExecuteTransaction({ transaction: txn });
+    
+        const test = await client.queryEvents({
+            filter: {
+                tx_hash: result?.execution_info?.tx_hash,
+            },
+            queryOption: {
+                decode: true,
+            },
+        });
+    
+        const filterCheckInRaffleEvents = (events: PaginatedIndexerEventViews) => {
+            const targetEventType = `${MODULE_ADDRESS}::raffle::CheckInRaffleEmit`;
+            return events.data.filter((event: { event_type: string; }) => event.event_type === targetEventType);
+        };
+    
+        const filteredEvents = filterCheckInRaffleEvents(test);    
+        return filteredEvents[0]?.decoded_event_data?.value.result;
+    };
 
     const ClaimMaxRaffle = async () => {
         const txn = new Transaction();
