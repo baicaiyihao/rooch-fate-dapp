@@ -46,7 +46,7 @@ const AnimatedBackground = styled('div')`
   }
 `;
 
-// 添加浮动粒子动画
+// 添加ç
 const particleFloat = keyframes`
   0% {
     transform: translateY(0) rotate(0deg);
@@ -215,7 +215,8 @@ function CheckInPage() {
       
       // 设置今日奖励
       if (checkInConfig && record) {
-        const dayIndex = record.continue_days - 1;
+        // Convert BigInt to number before subtraction
+        const dayIndex = Number(record.continue_days) - 1;
         if (dayIndex >= 0 && dayIndex < checkInConfig.daily_rewards.length) {
           setTodayReward(checkInConfig.daily_rewards[dayIndex]);
         }
