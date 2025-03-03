@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.11.5",
     "@fontsource-variable/plus-jakarta-sans": "^5.0.21",
     "@fontsource-variable/raleway": "^5.0.20",
+    "@mui/icons-material": "^6.4.6",
     "@mui/lab": "^5.0.0-alpha.172",
     "@mui/material": "^5.16.4",
     "@roochnetwork/rooch-sdk": "^0.2.1",

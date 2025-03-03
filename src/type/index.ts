@@ -61,5 +61,54 @@ export type StakeInfo = {
     accumulated_fate: u128,
 }
 
+export type UserNftView = {
+    owner: address,                         // NFT owner address
+    level: u64,                             // Current level (1-7)
+    checkin_bonus: u64,                     // Check-in bonus percentage
+    raffle_discount: u64,                   // raffle discount percentage
+    stake_weight: u64,                      // Stake weight bonus percentage
+    burn_amount: u256,                      // Total FATE burned by user
+    end_time: u64                           // NFT benefit expiry, synced with leaderboard cycle
+}
+
+export interface RankingsTableData {
+    address: string;
+    amount: string;
+}
+
+export interface UserRewards {
+    rgas_amount: u256,                      // RGas reward allocation
+    grow_amount: u256,                      // GROW reward allocation
+    is_claim: bool    
+}
 
 
+export interface RankTier {
+    min_rank: u64,                          // Minimum rank (inclusive)
+    max_rank: u64,                          // Maximum rank (inclusive, or infinity)
+    level: u64          
+}
+
+
+export interface LevelConfig {
+    level: u64,                             // Level ID (1-7)
+    checkin_bonus: u64,                     // Check-in bonus percentage
+    raffle_discount: u64,                   // Market discount percentage
+    stake_weight: u64  
+}
+
+
+export interface LevelConfigsTableData {
+    level: u64;
+    value: LevelConfig;
+}
+
+export interface RankTiersTableData {
+    level: u64;
+    value: RankTier;
+}
+
+export interface UserRewardsTableData {
+    address: u64;
+    value: UserRewards;
+}

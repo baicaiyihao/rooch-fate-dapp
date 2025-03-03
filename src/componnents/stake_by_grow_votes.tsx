@@ -26,6 +26,7 @@ export function StakeByGrowVotes(){
                 Args.objectId(projectlist?.data[0]?.id),
             ],
         });
+        console.log(projectlist?.data[0]?.id);
         return await signAndExecuteTransaction({ transaction: txn });
     }
 
@@ -73,7 +74,6 @@ export function StakeByGrowVotes(){
                 Args.address(address),
             ],
         }) as any;
-        console.log(result);
         return result?.return_values[0]?.decoded_value?.value;
     }
 
@@ -87,8 +87,20 @@ export function StakeByGrowVotes(){
         return result?.return_values[0]?.decoded_value?.value;
     }
 
+    const QueryProjectName = async (): Promise<String> => {
+        const result = await client.executeViewFunction({
+            address: MODULE_ADDRESS,
+            module: "stake_by_grow_votes",
+            function: "query_project_name",
+            args: [],
+        }) as any;
+        console.log(result);
+        return result?.return_values[0]?.decoded_value;
+    }
+
     return {
         QueryStakePoolInfo,
+        QueryProjectName,
         GetStakeInfo,
         UpdateGrowVotes,
         Stake,

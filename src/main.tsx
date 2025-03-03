@@ -10,7 +10,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CheckInPage from "./pages/CheckInPage.tsx";
-import RafflePage from "./pages/Raffle.tsx";
+import RafflePage from "./pages/RafflePage.tsx";
+import StakePage from "./pages/StakePage.tsx";
+import LeaderboardPage from "./pages/LeaderboardPage.tsx";
 import App from "./App.tsx";
 import "./index.css";
 import { networkConfig } from "./networks.ts";
@@ -50,10 +52,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       },
       components: {
         MuiStack: {
-          defaultProps: {
-            direction: "row",
-            alignItems: "center",
-          },
+          // defaultProps: {
+          //   direction: "row",
+          //   alignItems: "center",
+            
+          // },
         },
         MuiChip: {
           defaultProps: {
@@ -80,6 +83,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<App />} />
               <Route path="/check-in" element={<CheckInPage />} />
               <Route path="/raffle" element={<RafflePage/>} />
+              <Route path="/stake" element={<StakePage/>} />
+              <Route path="/leaderboard" element={<LeaderboardPage/>} />
+
             </Routes>
           </BrowserRouter>
         </WalletProvider>
