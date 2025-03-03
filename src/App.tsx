@@ -16,9 +16,9 @@ import {
 import { useEffect, useState } from "react";  // 引入 React 的 useState hook
 import "./App.css";  // 引入应用的样式文件
 import { shortAddress } from "./utils";  // 引入工具函数 shortAddress
-import { StakeByGrowVotes } from './componnents/stake_by_grow_votes';
-import { CheckIn } from './componnents/check_in';
-import { Raffle } from './componnents/raffle';
+// import { StakeByGrowVotes } from './componnents/stake_by_grow_votes';
+// import { CheckIn } from './componnents/check_in';
+// import { Raffle } from './componnents/raffle';
 import { GridNavigation, NavigationCard } from './componnents/grid_navigation'; 
 import { keyframes } from "@emotion/react";
 import { styled } from "@mui/material/styles";
@@ -94,28 +94,28 @@ function App() {
   const [sessionLoading, setSessionLoading] = useState(false);  // sessionKey 创建状态
   console.log("sessionKey", sessionKey);
 
-  const { 
-    QueryStakePoolInfo, 
-    GetStakeInfo, 
-    UpdateGrowVotes, 
-    Stake, 
-    UnStake, 
-    ClaimRewords, 
-  } = StakeByGrowVotes();
+  // const { 
+  //   QueryStakePoolInfo, 
+  //   GetStakeInfo, 
+  //   UpdateGrowVotes, 
+  //   Stake, 
+  //   UnStake, 
+  //   ClaimRewords, 
+  // } = StakeByGrowVotes();
 
-  const {
-    CheckIn: handleCheckIn,
-    GetWeekRaffle,
-    QueryDailyCheckInConfig,
-    QueryCheckInRecord,
-  } = CheckIn();
+  // const {
+  //   CheckIn: handleCheckIn,
+  //   GetWeekRaffle,
+  //   QueryDailyCheckInConfig,
+  //   QueryCheckInRecord,
+  // } = CheckIn();
 
-  const {
-    GetCheckInRaffleByFate,
-    ClaimMaxRaffle,
-    QueryCheckInRaffle,
-    QueryCheckInRaffleRecord,
-  } = Raffle();
+  // const {
+  //   GetCheckInRaffleByFate,
+  //   ClaimMaxRaffle,
+  //   QueryCheckInRaffle,
+  //   QueryCheckInRaffleRecord,
+  // } = Raffle();
 
   
   const [checkInData, setCheckInData] = useState<any>(null);
@@ -183,70 +183,70 @@ function App() {
   ];
 
   // 处理函数
-  const handleStakeOperations = {
-    queryPool: async () => {
-      const result = await QueryStakePoolInfo();
-      console.log('Stake Pool Info:', result);
-    },
-    getInfo: async () => {
-      const result = await GetStakeInfo();
-      console.log('Stake Info:', result);
-    },
-    update: async () => {
-      const result = await UpdateGrowVotes();
-      console.log('Update Result:', result);
-    },
-    stake: async () => {
-      const result = await Stake();
-      console.log('Stake Result:', result);
-    },
-    unstake: async () => {
-      const result = await UnStake();
-      console.log('Unstake Result:', result);
-    },
-    claim: async () => {
-      const result = await ClaimRewords();
-      console.log('Claim Result:', result);
-    }
-  };
+  // const handleStakeOperations = {
+  //   queryPool: async () => {
+  //     const result = await QueryStakePoolInfo();
+  //     console.log('Stake Pool Info:', result);
+  //   },
+  //   getInfo: async () => {
+  //     const result = await GetStakeInfo();
+  //     console.log('Stake Info:', result);
+  //   },
+  //   update: async () => {
+  //     const result = await UpdateGrowVotes();
+  //     console.log('Update Result:', result);
+  //   },
+  //   stake: async () => {
+  //     const result = await Stake();
+  //     console.log('Stake Result:', result);
+  //   },
+  //   unstake: async () => {
+  //     const result = await UnStake();
+  //     console.log('Unstake Result:', result);
+  //   },
+  //   claim: async () => {
+  //     const result = await ClaimRewords();
+  //     console.log('Claim Result:', result);
+  //   }
+  // };
 
-  const handleCheckInOperations = {
-    checkIn: async () => {
-      const result = await handleCheckIn();
-      console.log('Check In Result:', result);
-    },
-    weekRaffle: async () => {
-      const result = await GetWeekRaffle();
-      console.log('Week Raffle Result:', result);
-    },
-    queryConfig: async () => {
-      const result = await QueryDailyCheckInConfig();
-      console.log('Config:', result);
-    },
-    queryRecord: async () => {
-      const result = await QueryCheckInRecord();
-      console.log('Record:', result);
-    }
-  };
+  // const handleCheckInOperations = {
+  //   checkIn: async () => {
+  //     const result = await handleCheckIn();
+  //     console.log('Check In Result:', result);
+  //   },
+  //   weekRaffle: async () => {
+  //     const result = await GetWeekRaffle();
+  //     console.log('Week Raffle Result:', result);
+  //   },
+  //   queryConfig: async () => {
+  //     const result = await QueryDailyCheckInConfig();
+  //     console.log('Config:', result);
+  //   },
+  //   queryRecord: async () => {
+  //     const result = await QueryCheckInRecord();
+  //     console.log('Record:', result);
+  //   }
+  // };
 
-  const handleRaffleOperations = {
-    getByFate: async () => {
-      const result = await GetCheckInRaffleByFate();
-      console.log('Raffle By Fate:', result);
-    },
-    claimMax: async () => {
-      const result = await ClaimMaxRaffle();
-      console.log('Claim Max Result:', result);
-    },
-    queryRaffle: async () => {
-      const result = await QueryCheckInRaffle();
-      console.log('Raffle Info:', result);
-    },
-    queryRecord: async () => {
-      const result = await QueryCheckInRaffleRecord();
-      console.log('Raffle Record:', result);
-    }
-  };
+  // const handleRaffleOperations = {
+  //   getByFate: async () => {
+  //     const result = await GetCheckInRaffleByFate();
+  //     console.log('Raffle By Fate:', result);
+  //   },
+  //   claimMax: async () => {
+  //     const result = await ClaimMaxRaffle();
+  //     console.log('Claim Max Result:', result);
+  //   },
+  //   queryRaffle: async () => {
+  //     const result = await QueryCheckInRaffle();
+  //     console.log('Raffle Info:', result);
+  //   },
+  //   queryRecord: async () => {
+  //     const result = await QueryCheckInRaffleRecord();
+  //     console.log('Raffle Record:', result);
+  //   }
+  // };
 
 
   // 创建 sessionKey 的处理函数
@@ -292,15 +292,8 @@ function App() {
 
   return (
     <>
-    {/* 添加动画背景 */}
-    <AnimatedBackground />
-    
-    {/* 移除暂时添加浮动粒子 */}
-    {/* <Particle size={15} top="10%" left="10%" delay={0} />
-    <Particle size={20} top="20%" left="80%" delay={1} />
-    <Particle size={12} top="70%" left="15%" delay={2} />
-    <Particle size={18} top="40%" left="60%" delay={1.5} />
-    <Particle size={10} top="80%" left="75%" delay={0.5} /> */}
+         <AnimatedBackground />
+
     <Stack
       className="font-sans min-w-[1024px]"
       direction="column"
@@ -311,7 +304,6 @@ function App() {
       }}
     >
       <Stack justifyContent="space-between" className="w-full">
-        {/* <Text>FATE</Text> */}
         <Box sx={{ fontWeight: 'bold' }} width="120px">FATEX</Box>
 
 
@@ -459,7 +451,7 @@ function App() {
         )}
       </Stack>
       <Divider className="w-full !mt-12" />
-      <Stack
+      {/* <Stack
         className="mt-4 w-full font-medium"
         direction="column"
         alignItems="flex-start"
@@ -505,8 +497,8 @@ function App() {
             Claim Rewards
           </LoadingButton>
         </Stack>
-      </Stack>
-      <Divider className="w-full !mt-12" />
+      </Stack> */}
+      {/* <Divider className="w-full !mt-12" />
       <Stack
         className="mt-4 w-full font-medium"
         direction="column"
@@ -541,10 +533,10 @@ function App() {
             Query Record
           </LoadingButton>
         </Stack>
-      </Stack>
+      </Stack> */}
 
       {/* Raffle Operations 部分 */}
-      <Divider className="w-full !mt-12" />
+      {/* <Divider className="w-full !mt-12" />
       <Stack
         className="mt-4 w-full font-medium"
         direction="column"
@@ -579,7 +571,7 @@ function App() {
             Query Record
           </LoadingButton>
         </Stack>
-      </Stack>
+      </Stack> */}
      
       </Stack>
       </>
