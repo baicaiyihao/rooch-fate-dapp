@@ -76,7 +76,17 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     })}
   >
     <QueryClientProvider client={queryClient}>
-      <RoochProvider networks={networkConfig} defaultNetwork="testnet">
+      <RoochProvider networks={networkConfig} 
+      sessionConf={{
+        appName: 'Fate X',
+        appUrl: process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:5173' 
+  : 'https://fatex.zone',
+        scopes: [`0xbdd832f8c72aac37d0da3b6cb5a7ae89928ee52e5d5d6b991dfcbf6902007f50::*::*`],
+        maxInactiveInterval: 86400,
+      }}
+      defaultNetwork="testnet"  
+     >
         <WalletProvider chain={"bitcoin"} autoConnect>
         <BrowserRouter>
             <Routes>

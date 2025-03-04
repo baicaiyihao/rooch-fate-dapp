@@ -1,4 +1,4 @@
-import { useCurrentAddress, useRoochClient, UseSignAndExecuteTransaction } from "@roochnetwork/rooch-sdk-kit";
+import { useCurrentAddress, useRoochClient, useSignAndExecuteTransaction } from "@roochnetwork/rooch-sdk-kit";
 import { Args, Transaction } from "@roochnetwork/rooch-sdk";
 import { MODULE_ADDRESS } from "../config/constants";
 import { DailyCheckInConfig } from "../type";
@@ -6,7 +6,7 @@ import { CheckInRecord } from "../type";
 
 
 export function CheckIn(){
-    const { mutateAsync: signAndExecuteTransaction } = UseSignAndExecuteTransaction();
+    const { mutateAsync: signAndExecuteTransaction } = useSignAndExecuteTransaction();
     const client = useRoochClient();
     const currentAddress = useCurrentAddress();
 

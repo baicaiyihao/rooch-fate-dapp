@@ -10,14 +10,17 @@ import {
   useCurrentAddress,
   useCurrentSession,
   useRemoveSession,
-  useWalletStore,
   useWallets,
-} from "@roochnetwork/rooch-sdk-kit";  // 从 Rooch SDK Kit 中引入所需的 hooks
+  ConnectButton,
+  useCurrentWallet,
+  useAutoConnectWallet
+} from "@roochnetwork/rooch-sdk-kit"; 
+ // 从 Rooch SDK Kit 中引入所需的 hooks
 import { useEffect, useState } from "react";  // 引入 React 的 useState hook
 import "./App.css";  // 引入应用的样式文件
 import { shortAddress } from "./utils";  // 引入工具函数 shortAddress
 // import { StakeByGrowVotes } from './componnents/stake_by_grow_votes';
-// import { CheckIn } from './componnents/check_in';
+import { CheckIn } from './componnents/check_in';
 // import { Raffle } from './componnents/raffle';
 import { GridNavigation, NavigationCard } from './componnents/grid_navigation'; 
 import { keyframes } from "@emotion/react";
@@ -65,6 +68,7 @@ const AnimatedBackground = styled('div')`
 `;
 
 // 添加浮动粒子动画
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const particleFloat = keyframes`
   0% {
     transform: translateY(0) rotate(0deg);
@@ -81,11 +85,15 @@ const particleFloat = keyframes`
 
 
 function App() {
-  const wallets = useWallets();
+  const currentWallet = useCurrentWallet();
   const currentAddress = useCurrentAddress();
   const sessionKey = useCurrentSession();
-  const connectionStatus = useWalletStore((state) => state.connectionStatus);
-  const setWalletDisconnected = useWalletStore((state) => state.setWalletDisconnected);
+  
+  // const connectionStatus = useWalletStore((state) => state.connectionStatus);
+  // const setWalletDisconnected = useWalletStore
+
+  // const setWalletDisconnected = useWalletStore((state) => state.setWalletDisconnected);
+  useSessionKeyManager();
   const { mutateAsync: connectWallet } = useConnectWallet();
   
   const { mutateAsync: createSessionKey } = useCreateSessionKey();
@@ -103,12 +111,10 @@ function App() {
   //   ClaimRewords, 
   // } = StakeByGrowVotes();
 
-  // const {
-  //   CheckIn: handleCheckIn,
-  //   GetWeekRaffle,
-  //   QueryDailyCheckInConfig,
-  //   QueryCheckInRecord,
-  // } = CheckIn();
+  const {
+    QueryDailyCheckInConfig,
+    QueryCheckInRecord,
+  } = CheckIn();
 
   // const {
   //   GetCheckInRaffleByFate,
@@ -148,7 +154,6 @@ function App() {
       icon: "💰",
       onClick: () => window.location.href = '/stake',
       width:{lg:8}
-      　
     },
     {
       title: "每日签到",
@@ -248,7 +253,6 @@ function App() {
   //   }
   // };
 
-
   // 创建 sessionKey 的处理函数
   const handlerCreateSessionKey = async () => {
     if (sessionLoading) {
@@ -318,19 +322,23 @@ function App() {
             variant="filled"
             className="font-semibold !bg-slate-950 !text-slate-50 min-h-10"
           />
+       <Box style={{ marginBottom: 13 }}>
+          <ConnectButton style={{ cursor: 'pointer' }} />
+        </Box>
+
           <Button
             variant="outlined"
             onClick={async () => {
-              if (connectionStatus === "connected") {
+              if (currentWallet.isConnected) {
                 setWalletDisconnected();  // 如果已经连接，断开钱包
                 return;
               }
               await connectWallet({ wallet: wallets[0] });  // 连接钱包
             }}
           >
-            {connectionStatus === "connected"
+            {currentWallet.isConnected
               ? shortAddress(currentAddress?.genRoochAddress().toStr(), 8, 6)  // 如果已连接，显示部分地址
-              : "Connect Wallet"}  {/* 如果未连接，显示连接钱包按钮 */}
+              : "Connect Wallet"}  
           </Button>
         </Stack>
       </Stack>
@@ -429,12 +437,12 @@ function App() {
             loading={sessionLoading}
             variant="contained"
             className="!mt-4"
-            disabled={connectionStatus !== "connected"}  // 如果未连接钱包，禁用按钮
+            disabled={currentWallet.isDisconnected}  // 如果未连接钱包，禁用按钮
             onClick={() => {
               handlerCreateSessionKey();  // 调用创建 sessionKey 的函数
             }}
           >
-            {connectionStatus !== "connected"
+            {currentWallet.isDisconnected
               ? "Please connect wallet first"
               : "Create"}  {/* 如果未连接钱包，提示连接钱包 */}
           </LoadingButton>

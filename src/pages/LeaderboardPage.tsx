@@ -14,8 +14,10 @@ import {
 } from '@mui/material';
 import { Leaderboard } from '../componnents/leaderboard';
 import { UserNft } from '../componnents/usernft';
-import { useCurrentAddress } from '@roochnetwork/rooch-sdk-kit';
+import { useCurrentAddress, useRoochClient } from '@roochnetwork/rooch-sdk-kit';
 import { RankTiersTableData } from '../type';
+import { getCoinDecimals, formatBalance } from '../utils/coinUtils';
+import { FATETYPE } from '../config/constants';
 import { motion } from 'framer-motion';
 
 // Define background animation
@@ -89,6 +91,8 @@ export default function LeaderboardPage() {
   const [userNftData, setUserNftData] = useState<any>(null);
   const [burnAmount, setBurnAmount] = useState<string>('');
   const currentAddress = useCurrentAddress();
+  const [fateBalance, setFateBalance] = useState<string>('0');
+  const client = useRoochClient();
 
   const { 
     QueryLeaderboardRankingsData, 
@@ -149,30 +153,7 @@ export default function LeaderboardPage() {
     return tierInfo ? Number(tierInfo.value.level) : '-';
   };
 
-  // Fetch data on component mount
-  useEffect(() => {
-    fetchRankingsData();
-    fetchUserNftData();
-  }, []);
-
-  // Handle burn action
-  const handleBurn = async () => {
-    if (!burnAmount || isNaN(Number(burnAmount))) {
-      alert('Please enter a valid amount');
-      return;
-    }
-
-    try {
-      await Burnfate(Number(burnAmount));
-      alert('Burn successful');
-      fetchRankingsData();
-      fetchUserNftData();
-      setBurnAmount('');
-    } catch (error) {
-      console.error('Burn failed:', error);
-      alert('Burn failed');
-    }
-  };
+ 
 
   // Shorten address for display
   const shortenAddress = (address: string) => {
@@ -185,6 +166,51 @@ export default function LeaderboardPage() {
     const userAddress = currentAddress?.genRoochAddress().toHexAddress();
     const userRanking = rankings.find(item => item.address === userAddress);
     return userRanking?.rank || '-';
+  };
+
+  const fetchFateBalance = async () => {
+    if (!currentAddress || !client) return;
+    
+    try {
+        const decimals = await getCoinDecimals(client, FATETYPE);
+        const balance = await client.getBalance({
+            owner: currentAddress?.genRoochAddress().toHexAddress() || "",
+            coinType: FATETYPE
+        }) as any;
+        setFateBalance(formatBalance(balance?.balance, decimals));
+    } catch (error) {
+        console.error('获取 FATE 余额失败:', error);
+        setFateBalance('0');
+    }
+};
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchRankingsData();
+    fetchUserNftData();
+    fetchFateBalance();
+  }, []);
+
+  // Handle burn action
+  const handleBurn = async () => {
+    if (!burnAmount || isNaN(Number(burnAmount))) {
+      alert('Please enter a valid amount');
+      return;
+    }
+
+    try {
+      await Burnfate(Number(burnAmount));
+      alert('Burn successful');
+      await Promise.all([
+        fetchRankingsData(),
+        fetchUserNftData(),
+        fetchFateBalance()
+    ]);
+    setBurnAmount('');
+    } catch (error) {
+      console.error('Burn failed:', error);
+      alert('Burn failed');
+    }
   };
 
   return (
@@ -242,7 +268,10 @@ export default function LeaderboardPage() {
                       size="small"
                       sx={{ width: 200 }}
                     />
-                    <StyledButton variant="contained" color="primary" onClick={handleBurn}>
+                    <Typography color="text.secondary">当前 FATE 余额: {fateBalance}</Typography>
+                    <StyledButton variant="contained" color="primary" onClick={handleBurn}  disabled={!burnAmount || 
+                                    Number(burnAmount) <= 0 || 
+                                    Number(burnAmount) > Number(fateBalance)}>
                       燃烧
                     </StyledButton>
                   </Stack>

@@ -1,10 +1,10 @@
 import { Args, Transaction } from "@roochnetwork/rooch-sdk";
 import { MODULE_ADDRESS } from "../config/constants";
-import { useCurrentAddress, useRoochClient, UseSignAndExecuteTransaction } from "@roochnetwork/rooch-sdk-kit";
+import { useCurrentAddress, useRoochClient, useSignAndExecuteTransaction } from "@roochnetwork/rooch-sdk-kit";
 import { StakeInfo, StakePoolInfo } from "../type";
 
 export function StakeByGrowVotes(){
-    const { mutateAsync: signAndExecuteTransaction } = UseSignAndExecuteTransaction();
+    const { mutateAsync: signAndExecuteTransaction } = useSignAndExecuteTransaction();
     const currentAddress = useCurrentAddress();
     const client = useRoochClient();
 

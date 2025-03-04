@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { LoadingButton } from "@mui/lab";
 import { Button, Card, CardContent, Typography, Box, Chip, Grid, Fade, Zoom, Alert, Stack } from "@mui/material";
 import { StakeByGrowVotes } from '../componnents/stake_by_grow_votes';
-import { useCurrentAddress, useWalletStore } from '@roochnetwork/rooch-sdk-kit';
 import { styled } from "@mui/material/styles";
 import { keyframes } from "@emotion/react";
 import { motion } from "framer-motion";
 import Confetti from 'react-confetti';
 import useWindowSize from 'react-use/lib/useWindowSize';
+import { useCurrentAddress, useWallets, useRoochClient } from '@roochnetwork/rooch-sdk-kit';
+import { getCoinDecimals, formatBalance } from '../utils/coinUtils';
+import { FATETYPE } from '../config/constants';
 
 // 定义背景动画
 const backgroundAnimation = keyframes`
@@ -103,8 +105,10 @@ export default function StakePage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [justStaked, setJustStaked] = useState(false);
   const currentAddress = useCurrentAddress();
-  const connectionStatus = useWalletStore((state) => state.connectionStatus);
+  const connectionStatus = useWallets();
   const { width, height } = useWindowSize();
+  const [fateBalance, setFateBalance] = useState<string>('0');
+  const client = useRoochClient();
 
   const { 
     QueryStakePoolInfo, 
@@ -142,6 +146,24 @@ export default function StakePage() {
     }
   };
 
+  const fetchFateBalance = async () => {
+    if (!currentAddress || !client) return;
+    
+    try {
+        const decimals = await getCoinDecimals(client, FATETYPE);
+        const balance = await client.getBalance({
+            owner: currentAddress?.genRoochAddress().toHexAddress() || "",
+            coinType: FATETYPE
+        }) as any;
+        console.log(balance);
+        setFateBalance(formatBalance(balance?.balance, decimals));
+    } catch (error) {
+        console.error('获取 FATE 余额失败:', error);
+        setFateBalance('0');
+    }
+};
+
+
   useEffect(() => {
     fetchPoolInfo();
   }, []);
@@ -149,6 +171,7 @@ export default function StakePage() {
   useEffect(() => {
     if (currentAddress) {
       fetchUserInfo();
+      fetchFateBalance();
     }
   }, [currentAddress]);
 
@@ -161,7 +184,7 @@ export default function StakePage() {
     setLoading(true);
     try {
       await Stake();
-      await fetchUserInfo();
+      await Promise.all([fetchUserInfo(), fetchPoolInfo()]);
       setShowSuccess(true);
       setJustStaked(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -177,8 +200,8 @@ export default function StakePage() {
     setLoading(true);
     try {
       await UnStake();
-      await fetchUserInfo();
-    } catch (error) {
+      await Promise.all([fetchUserInfo(), fetchPoolInfo()]);
+        } catch (error) {
       console.error('解除质押失败:', error);
     } finally {
       setLoading(false);
@@ -190,7 +213,7 @@ export default function StakePage() {
     setLoading(true);
     try {
       await ClaimRewords();
-      await fetchUserInfo();
+      await Promise.all([fetchUserInfo(), fetchFateBalance()]);
       setShowSuccess(true);
       setJustStaked(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -265,7 +288,7 @@ export default function StakePage() {
   );
 
   const renderUserStakeCard = () => {
-    if (!currentAddress || connectionStatus !== "connected") {
+    if (!currentAddress || connectionStatus) {
       return (
         <StyledCard elevation={3}>
           <CardContent>
@@ -305,7 +328,13 @@ export default function StakePage() {
             <Box component="span" sx={{ mr: 1, fontSize: '1.5rem' }}>👤</Box>
             我的质押
           </Typography>
-          <Stack spacing={3}>
+          <Stack spacing={4}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography>FATE 余额:</Typography>
+              <Zoom in={true} style={{ transitionDelay: '200ms' }}>
+                <Chip label={`${fateBalance}`} color="primary" sx={{ fontWeight: 'bold' }} />
+              </Zoom>
+            </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography>已质押数量:</Typography>
               <Zoom in={true} style={{ transitionDelay: '100ms' }}>
@@ -382,9 +411,9 @@ export default function StakePage() {
         sx={{ 
             minHeight: "100vh",
             padding: { xs: "1rem", md: "2rem" },
-            maxWidth: "1440px",  // 添加最大宽度
-            margin: "0 auto",    // 居中显示
-            width: "100%"        // 确保占满可用空间
+            maxWidth: "1440px",  
+            margin: "0 auto",    
+            width: "100%"      
           }}      >
         <Stack direction="row" justifyContent="space-between" alignItems="center"  sx={{ 
           mb: { xs: 4, md: 8 },

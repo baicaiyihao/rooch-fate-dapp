@@ -1,5 +1,5 @@
 import { LoadingButton } from "@mui/lab";
-import { Button, Card, CardContent, Stack, Typography, Box, Chip, Grid, Fade, Zoom } from "@mui/material";
+import { Button, Card, CardContent, Stack, Typography, Box, Chip, Grid, Fade, Zoom, Snackbar } from "@mui/material";
 import { useCurrentAddress } from "@roochnetwork/rooch-sdk-kit";
 import { useState, useEffect } from "react";
 import { CheckIn } from '../componnents/check_in';
@@ -78,6 +78,11 @@ function RafflePage() {
   const [justRaffled, setJustRaffled] = useState(false);
   const { width, height } = useWindowSize();
 
+  // Snackbar 状态
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+
   const { GetWeekRaffle, QueryCheckInRecord } = CheckIn();
   const { 
     GetCheckInRaffleByFate, 
@@ -127,17 +132,71 @@ function RafflePage() {
     }
   };
 
+  const getPrizeLevel = (result: number, config: any) => {
+    if (!result || !config) return null;
+
+    const resultNum = Number(result);
+    const grandWeight = Number(config.grand_prize_weight);
+    const secondWeight = Number(config.second_prize_weight);
+    const thirdWeight = Number(config.third_prize_weight);
+    
+    // 计算累积权重
+    const totalWeight = grandWeight + secondWeight + thirdWeight;
+    const normalizedResult = (resultNum / Number(config.max_raffle_count_weight)) * totalWeight;
+
+    if (normalizedResult <= grandWeight) {
+        return {
+            level: 1,
+            name: "特等奖",
+            duration: Number(config.grand_prize_duration)
+        };
+    } else if (normalizedResult <= (grandWeight + secondWeight)) {
+        return {
+            level: 2,
+            name: "二等奖",
+            duration: Number(config.second_prize_duration)
+        };
+    } else {
+        return {
+            level: 3,
+            name: "三等奖",
+            duration: Number(config.third_prize_duration)
+        };
+    }
+  };
+
   const handleFateRaffle = async () => {
     if (loading) return;
     
     setLoading(true);
     try {
-      await GetCheckInRaffleByFate();
+      const result = await GetCheckInRaffleByFate();
+      console.log('Fate抽奖结果:', result);
+      
+      // 添加类型检查
+      if (result === undefined) {
+        setSnackbarMessage('抽奖结果无效');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+        return;
+      }
+      
+      // 判断中奖等级
+      const prizeLevel = getPrizeLevel(Number(result), raffleConfig);
+      
+      if (prizeLevel) {
+        setSnackbarMessage(`恭喜获得${prizeLevel.name}！获取${prizeLevel.duration}FATE`);
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+      } 
       await fetchData();
       setJustRaffled(true);
       setTimeout(() => setJustRaffled(false), 3000);
     } catch (error) {
       console.error('Fate抽奖失败:', error);
+      setSnackbarMessage('抽奖失败，请重试');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
@@ -157,6 +216,10 @@ function RafflePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -325,6 +388,21 @@ function RafflePage() {
           </Fade>
         )}
       </Stack>
+
+      
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={5000} // 5秒后自动关闭，与原 message.success 的 5 秒一致
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        message={snackbarMessage}
+        sx={{
+          '& .MuiSnackbarContent-root': {
+            backgroundColor: snackbarSeverity === 'success' ? '#2e7d32' : '#d32f2f', // success: green, error: red
+            color: '#fff',
+          }
+        }}
+      />
     </>
   );
 }
